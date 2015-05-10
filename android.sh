@@ -31,7 +31,6 @@ PAUSE ()
 PREP ()
 {
 	CURRENT_STEP="Prep"
-	STEP=0
 	echo "Starting Prep."
 	if ! [ -d /tmp/nexus6/shamu-lmy47i/ ];
 		then
@@ -41,36 +40,31 @@ PREP ()
 		echo "This may take some time"
 		echo
 		cd /tmp
-		mktemp -d "nexus6"
+		mktemp -d "nexus6u" || ERROR_HANDLER
 		cd /tmp/nexus6
-		curl -O  https://dl.google.com/dl/android/aosp/shamu-lmy47i-factory-c8afc588.tgz
-		tar -zxvf shamu-lmy47i-factory-c8afc588.tgz
-		unzip shamu-lmy47i/image-shamu-lmy47i.zip
-		STEP=1 
+		curl -O  https://dl.google.com/dl/android/aosp/shamu-lmy47i-factory-c8afc588.tgz || ERROR_HANDLER
+		tar -zxvf shamu-lmy47i-factory-c8afc588.tgz || ERROR_HANDLER
+		unzip shamu-lmy47i/image-shamu-lmy47i.zip || ERROR_HANDLER
 	fi
 }
 
 SDK_CHECK ()
 {
-## ZIP up adb and fastboot and deliver those instead of installing android studio.
-## Use IF statement to check for SDK before checking /usr/bin
-## Install to usr/bin regarless
-
 	CURENT_STEP="SDK CHECK"
 	if ! [ -f ~/Library/Android/sdk/platform-tools/ ]
 		then
 		if ! [ -e /usr/bin/adb ]
 			then
-			sudo unzip ~/Downloads/tools.zip /usr/bin
+			unzip ~/Downloads/tools.zip -d /tmp/nexus6 || ERROR_HANDLER
+			sudo cp /tmp/nexus6/tools/adb /usr/local/bin/ || ERROR_HANDLER
+			sudo cp /tmp/nexus6/tools/fastboot /usr/local/bin/ || ERROR_HANDLER
 		else
 			echo "ADB and Fastboot look good."
 		fi		
 	else
-		cp ~/Library/Android/sdk/platform-tools/adb /usr/bin
-		cp ~/Library/Android/sdk/platform-tools/fastboot /usr/bin
-			
+		cp ~/Library/Android/sdk/platform-tools/adb /usr/local/bin || ERROR_HANDLER
+		cp ~/Library/Android/sdk/platform-tools/fastboot /usr/local/bin || ERROR_HANDLER
 	fi
-	STEP=2
 }
 
 ENTER_BOOTLOADER ()
@@ -81,40 +75,36 @@ ENTER_BOOTLOADER ()
 	echo "MAKE SURE OEM UNLOCKING is ON!"
 	PAUSE "Press any key to continue"
 	#if [ adb devices | grep 
-	adb reboot-bootloader # Enter Bootloader
+	adb reboot-bootloader || ERROR_HANDLER # Enter Bootloader 
 	echo "Please" ## Enter instructions for entering adb
 	PAUSE "Press any key to continue"
-	STEP=3
 }
 
 BOOTLOADER_RADIO ()
 {
 	CURRENT_STEP="Flashing Bootloader & Radio img."
-	fastboot flash bootloader /tmp/nexus6/shamu-lmy47i/bootloader-shamu-moto-apq8084-71.08.img # Flash Bootloader.img
-	fastboot flash radio /tmp/nexus6/shamu-lmy47i/radio-shamu-d4.0-9625-02.95.img # Flash Radio.img
-	STEP=4
+	fastboot flash bootloader /tmp/nexus6/shamu-lmy47i/bootloader-shamu-moto-apq8084-71.08.img || ERROR_HANDLER # Flash Bootloader.img
+	fastboot flash radio /tmp/nexus6/shamu-lmy47i/radio-shamu-d4.0-9625-02.95.img || ERROR_HANDLER # Flash Radio.img
 }
 
 BOOTLOADER_REBOOT ()
 {
 	CURRENT_STEP="Rebooting Bootloader"
-	fastboot reboot-bootloader # Reboot Bootloader
-	STEP=5
+	fastboot reboot-bootloader || ERROR_HANDLER # Reboot Bootloader
 }
 
 BOOTLOADER_RECOVERY_BOOT_SYSTEM ()
 {
 	CURRENT_STEP="Flashing Recovery, Boot, and System img."
-	fastboot flash recovery /tmp/nexus6/recovery.img # Flash Recovery.img
-	fastboot flash boot /tmp/nexus6/boot.img # Flash Boot.img
-	fastboot flash system /tmp/nexus6/system.img # Flash System.img
-	STEP=6
+	fastboot flash recovery /tmp/nexus6/recovery.img || ERROR_HANDLER # Flash Recovery.img
+	fastboot flash boot /tmp/nexus6/boot.img || ERROR_HANDLER # Flash Boot.img
+	fastboot flash system /tmp/nexus6/system.img || ERROR_HANDLER # Flash System.img
 }
 
 REBOOT ()
 {
 	CURRENT_STEP="Rebooting"
-	fastboot reboot # Reboot Device
+	fastboot reboot || ERROR_HANDLER # Reboot Device
 	echo "Rebooting your device"
 }
 
@@ -125,25 +115,40 @@ BOOTLOADER_ROOT ()
 	echo "Please wait till update is finished before proceeding"
 	echo
 	echo
-	PAUSE "Please press any key to proceed with rooting."
-	cd /tmp/nexus6
-	curl -O https://download.chainfire.eu/628/CF-Root1/CF-Auto-Root-shamu-shamu-nexus6.zip?retrieve_file=1
-	unzip CF-Auto-Root-shamu-shamu-nexus6.zip\?retrieve_file\=1	
-	flashboot bootloader
-	flashboot boot /tmp/image/CF-Auto-Root-shamu-shamu-nexus6.img
+	PAUSE "Please press any key to proceed with rooting."	
+	fastboot bootloader || ERROR_HANDLER
+	sleep 5
+	fastboot boot /tmp/nexus6/tools/image/CF-Auto-Root-shamu-shamu-nexus6.img || ERROR_HANDLER
 }
 
 CLEANUP ()
 {
-	sudo rm -rf /tmp/nexus6
+	sudo rm -rf /tmp/nexus6 || echo "Couldn't Delete /tmp/nexus6 "
 }
 #####			      #####
 ## Call Functions in Run Fuction ##
 #####			      #####
 RUN ()
 {
-PREP
-SDK_CHECK
+	PREP
+	SDK_CHECK
+	ENTER_BOOTLOADER
+	echo "Flash Device?"
+	PAUSE "Press any key to continue"
+	BOOTLOADER_RADIO
+	BOOTLOADER_REBOOT
+	sleep 5
+	BOOTLOADER_RECOVERY_BOOT_SYSTEM
+	REBOOT
+	read -p "Reboot Now?" yn
+		case $yn in
+			[Yy]* ) BOOTLOADER_ROOT
+				sleep 5
+				REBOOT
+				;;
+			 * ) break
+				;;
+		esac
 }
 
 ## Make sure $1 exists
@@ -152,8 +157,8 @@ SDK_CHECK
 ## Assuming it does:
 if [ $# -eq 0 ]
 	then
-	RUN
+		RUN
 	else
-	command=$1
+		command=$1
 	eval $1
 fi
