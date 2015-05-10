@@ -20,6 +20,7 @@ ERROR_HANDLER ()
 	echo "Script aborted while on $CURRENT_STEP."
 	echo
 	exit 1
+## Need to add || error statements.
 }
 
 PAUSE ()
@@ -31,6 +32,7 @@ PREP ()
 {
 	CURRENT_STEP="Prep"
 	STEP=0
+	echo "Starting Prep."
 	if ! [ -d /tmp/nexus6/shamu-lmy47i/ ];
 		then
 		echo
@@ -50,65 +52,69 @@ PREP ()
 
 SDK_CHECK ()
 {
+## ZIP up adb and fastboot and deliver those instead of installing android studio.
+## Use IF statement to check for SDK before checking /usr/bin
+## Install to usr/bin regarless
+
 	CURENT_STEP="SDK CHECK"
 	if ! [ -f ~/Library/Android/sdk/platform-tools/ ]
 		then
-		cd /tmp/nexus6
-		curl -O https://dl.google.com/dl/android/studio/install/1.2.0.12/android-studio-ide-141.1890965-mac.dmg		
-		open /tmp/nexus6/android-studio-ide-141.1890965-mac.dmg
-		echo "Move Android Studio to Application Folder"
-		PAUSE "Press any key to continue"
-		open /Applications/Android\ Studio.app/
-		sleep 10
-		PAUSE "Finsh Install then press a key"
-		echo "Copying adb and fastboot to /usr/binl"		
-		cp ~/Library/Android/sdk/platform-tools/adb /usr/bin
-		cp ~/Library/Android/sdk/platform-tools/fastboot /usr/bin	
+		if ! [ -e /usr/bin/adb ]
+			then
+			sudo unzip ~/Downloads/tools.zip /usr/bin
+		else
+			echo "ADB and Fastboot look good."
+		fi		
 	else
-		echo "ADB and Fastboot look good."			
+		cp ~/Library/Android/sdk/platform-tools/adb /usr/bin
+		cp ~/Library/Android/sdk/platform-tools/fastboot /usr/bin
+			
 	fi
 	STEP=2
 }
 
 ENTER_BOOTLOADER ()
 {
+## See about creating check for whether the device is attached
 	CURRENT_STEP="Entering Bootloader"
 	echo "Make sure phone is plugged in"
 	echo "MAKE SURE OEM UNLOCKING is ON!"
 	PAUSE "Press any key to continue"
-	adb devices | grep online
-	adb reboot-bootloader
+	#if [ adb devices | grep 
+	adb reboot-bootloader # Enter Bootloader
+	echo "Please" ## Enter instructions for entering adb
+	PAUSE "Press any key to continue"
 	STEP=3
 }
 
 BOOTLOADER_RADIO ()
 {
 	CURRENT_STEP="Flashing Bootloader & Radio img."
-	fastboot flash bootloader /tmp/nexus6/shamu-lmy47i/ #bootloader.img
-	fastboot flash radio /tmp/nexus6/shamu-lmy47i/ #radio.img
+	fastboot flash bootloader /tmp/nexus6/shamu-lmy47i/bootloader-shamu-moto-apq8084-71.08.img # Flash Bootloader.img
+	fastboot flash radio /tmp/nexus6/shamu-lmy47i/radio-shamu-d4.0-9625-02.95.img # Flash Radio.img
 	STEP=4
 }
 
 BOOTLOADER_REBOOT ()
 {
 	CURRENT_STEP="Rebooting Bootloader"
-	fastboot reboot-bootloader
+	fastboot reboot-bootloader # Reboot Bootloader
 	STEP=5
 }
 
 BOOTLOADER_RECOVERY_BOOT_SYSTEM ()
 {
 	CURRENT_STEP="Flashing Recovery, Boot, and System img."
-	fastboot flash recovery /tmp/shamu-lmy47i/ #recovery.img
-	fastboot flash boot /tmp/shamu-lmy47i/ #boot.img
-	fastboot flash system /tmp/shamu-lmy47i/ #system.img
+	fastboot flash recovery /tmp/nexus6/recovery.img # Flash Recovery.img
+	fastboot flash boot /tmp/nexus6/boot.img # Flash Boot.img
+	fastboot flash system /tmp/nexus6/system.img # Flash System.img
 	STEP=6
 }
 
 REBOOT ()
 {
 	CURRENT_STEP="Rebooting"
-	fastboot reboot
+	fastboot reboot # Reboot Device
 	echo "Rebooting your device"
 }
 
@@ -131,9 +137,9 @@ CLEANUP ()
 {
 	sudo rm -rf /tmp/nexus6
 }
-#####
-##Call Functions in Run Fuction
-#####
+#####			      #####
+## Call Functions in Run Fuction ##
+#####			      #####
 RUN ()
 {
 PREP
@@ -141,6 +147,8 @@ SDK_CHECK
 }
 
 ## Make sure $1 exists
+## If it dosen't, run the RUN function
+## If it does, run that function
 ## Assuming it does:
 if [ $# -eq 0 ]
 	then
