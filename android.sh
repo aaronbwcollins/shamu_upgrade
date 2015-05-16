@@ -20,7 +20,6 @@ ERROR_HANDLER ()
 	echo "Script aborted while on $CURRENT_STEP."
 	echo
 	exit 1
-## Need to add || error statements.
 }
 
 PAUSE ()
@@ -31,16 +30,17 @@ PAUSE ()
 PREP ()
 {
 	CURRENT_STEP="Prep"
+	echo
 	echo "Starting Prep."
 	if ! [ -d /tmp/nexus6/shamu-lmy47i/ ];
 		then
 		echo
-		echo "Getting Base Image"
+		echo "Getting Base Image."
 		echo
-		echo "This may take some time"
+		echo "This may take some time..."
 		echo
 		cd /tmp
-		mktemp -d "nexus6u" || ERROR_HANDLER
+		mktemp -d "nexus6" || ERROR_HANDLER
 		cd /tmp/nexus6
 		curl -O  https://dl.google.com/dl/android/aosp/shamu-lmy47i-factory-c8afc588.tgz || ERROR_HANDLER
 		tar -zxvf shamu-lmy47i-factory-c8afc588.tgz || ERROR_HANDLER
@@ -71,13 +71,16 @@ ENTER_BOOTLOADER ()
 {
 ## See about creating check for whether the device is attached
 	CURRENT_STEP="Entering Bootloader"
+	echo
 	echo "Make sure phone is plugged in"
 	echo "MAKE SURE OEM UNLOCKING is ON!"
-	PAUSE "Press any key to continue"
+	PAUSE "Press any key to continue..."
 	#if [ adb devices | grep 
 	adb reboot-bootloader || ERROR_HANDLER # Enter Bootloader 
-	echo "Please" ## Enter instructions for entering adb
-	PAUSE "Press any key to continue"
+	#echo "Please" ## Enter instructions for entering adb
+	echo
+	echo "Entering Bootloader"
+	PAUSE "Press any key to continue..."
 }
 
 BOOTLOADER_RADIO ()
@@ -105,36 +108,43 @@ REBOOT ()
 {
 	CURRENT_STEP="Rebooting"
 	fastboot reboot || ERROR_HANDLER # Reboot Device
-	echo "Rebooting your device"
+	echo "Rebooting your device."
 }
 
 BOOTLOADER_ROOT ()
 {
 	CURRENT_STEP="Rooting Device"
 	echo
-	echo "Please wait till update is finished before proceeding"
+	echo "Please wait till update is finished before proceeding."
 	echo
 	echo
 	PAUSE "Please press any key to proceed with rooting."	
-	fastboot bootloader || ERROR_HANDLER
+	adb reboot-bootloader || ERROR_HANDLER
 	sleep 5
-	fastboot boot /tmp/nexus6/tools/image/CF-Auto-Root-shamu-shamu-nexus6.img || ERROR_HANDLER
+	fastboot boot /tmp/nexus6/tools/CF-Auto-Root-shamu-shamu-nexus6.img || ERROR_HANDLER
 }
 
 CLEANUP ()
 {
 	sudo rm -rf /tmp/nexus6 || echo "Couldn't Delete /tmp/nexus6 "
+	echo
+	echo "All done!"
+	echo
+	echo "Your phone will take a while to boot."
+	echo "This is normal."
+	echo "Be Patient!"
+	echo
 }
-#####			      #####
+#####
 ## Call Functions in Run Fuction ##
-#####			      #####
+#####
 RUN ()
 {
 	PREP
 	SDK_CHECK
 	ENTER_BOOTLOADER
 	echo "Flash Device?"
-	PAUSE "Press any key to continue"
+	PAUSE "Press any key to continue..."
 	BOOTLOADER_RADIO
 	BOOTLOADER_REBOOT
 	sleep 5
@@ -149,6 +159,7 @@ RUN ()
 			 * ) break
 				;;
 		esac
+	CLEANUP
 }
 
 ## Make sure $1 exists
