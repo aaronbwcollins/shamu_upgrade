@@ -135,6 +135,24 @@ CLEANUP ()
 	echo "Be Patient!"
 	echo
 }
+
+help ()
+{
+	echo
+	echo "Commands Availabe:"
+	echo
+	echo "PREP, SDK_CHECK, ENTER_BOOTLOADER, BOOTLOADER_RADIO,"
+	echo "BOOTLOADER_REBOOT, BOOTLOADER_RECOVERY_BOOT_SYSTEM, REBOOT"
+	echo "BOOTLOADER_ROOT CLEANUP"
+	echo
+	echo "Type ./android.sh to run the full script"
+	echo
+	echo
+	echo "Type ./android.sh COMMAND to specify a function" 
+	echo 
+	echo
+	echo
+}
 #####
 ## Call Functions in Run Fuction ##
 #####

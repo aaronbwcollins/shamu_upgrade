@@ -14,18 +14,22 @@ You will need to be in able to run sudo!
 
 ***Downloading the Zip***
 
-Download the zip. Unzip the file and double click on .sh file.
+Download the zip. Unzip the file and double click on android.sh file. Open with terminal.
 You will need to be an admin!
+
+## Usage
+
+Type `./android.sh help` to see the different functions the script performs. Call the `./android.sh` without an argument runs the full script.
 
 ## Requirments
 
 You must be running Mac OSX and have a nexus6 device that is already rooted.
-*Don't use this to do root your phone for the first time! This is not tested, and will not work!
+**Don't use this script to root your phone for the first time! This is not tested, and will not work!**
 
 ### Notice
 
 By using this script you awknowledge that you are using this script at your own risk.
-As always messing with the command line is dangerous, and although this script dosen't touch your user partition, anything can happen.
+As always, messing with the command line is dangerous. Although this script dosen't touch your user partition, anything can happen.
 I provide no warranty, limited or otherwise.
 
 ### Brief
