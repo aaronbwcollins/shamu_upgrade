@@ -3,7 +3,7 @@
 This script is for rooted Nexus 6 devices. 
 Upgrading can be a pain, but now it doesn't have to be!
 Simply run the script with your phone plugged in and usb debugging on, the script will do the rest.
-This script takes advatage of chainfire's boot image. I do not take credit for it, instead utilize it to get you back to a rooted state.
+This script takes advantage of chainfire's boot image. I do not take credit for it, instead utilize it to get you back to a rooted state.
 
 # Running the script
 
@@ -19,7 +19,7 @@ You will need to be an admin!
 
 ## Usage
 
-Type `./android.sh help` to see the different functions the script performs. Call the `./android.sh` without an argument runs the full script.
+Type `./android.sh help` to see the different functions the script performs. Calling the `./android.sh` without an argument runs the full script.
 
 ## Requirments
 
@@ -28,8 +28,8 @@ You must be running Mac OSX and have a nexus6 device that is already rooted.
 
 ### Notice
 
-By using this script you awknowledge that you are using this script at your own risk.
-As always, messing with the command line is dangerous. Although this script dosen't touch your user partition, anything can happen.
+By using this script you acknowledge that you are using this script at your own risk.
+As always, messing with the command line is dangerous. Although this script doesn't touch your user partition, anything can happen.
 I provide no warranty, limited or otherwise.
 
 ### Brief
