@@ -31,12 +31,37 @@ PAUSE ()
 
 VARIABLES ()
 {
-	#OTHER CARRIERS
-	image_link="https://dl.google.com/dl/android/aosp/shamu-lmy47i-factory-c8afc588.tgz"
-	tar_file="shamu-lmy47i-factory-c8afc588.tgz"
-	zip_file="shamu-lmy47i/image-shamu-lmy47i.zip"
-	bootloader="shamu-lmy47i/bootloader-shamu-moto-apq8084-71.08.img"
-	radio="shamu-lmy47i/radio-shamu-d4.0-9625-02.95.img"
+#!/bin/bash
+# Bash Menu Script Example
+
+PS3='Please enter your choice: '
+options=("T-Mobile" "Project Fi" "Other Carriers" "Quit")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "1")
+            echo "you chose choice 1"
+            ;;
+        "2")
+            echo "you chose choice 2"
+            ;;
+        "Other Carriers")
+            echo "you choose Other Carriers"
+            #OTHER CARRIERS
+			image_link="https://dl.google.com/dl/android/aosp/shamu-lmy47i-factory-c8afc588.tgz"
+			tar_file="shamu-lmy47i-factory-c8afc588.tgz"
+			zip_file="shamu-lmy47i/image-shamu-lmy47i.zip"
+			bootloader="shamu-lmy47i/bootloader-shamu-moto-apq8084-71.08.img"
+			radio="shamu-lmy47i/radio-shamu-d4.0-9625-02.95.img"
+            break
+            ;;
+        "Quit")
+            exit 1
+            ;;
+        *) echo invalid option;;
+    esac
+done
+
 }
 
 PREP ()
