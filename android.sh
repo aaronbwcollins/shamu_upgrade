@@ -6,7 +6,7 @@
 #
 # Nexus 6 Rooted upgrade script
 #
-# v 1.0
+# v 2.0
 #
 # By Aaron B.W. Collins
 #
@@ -14,6 +14,8 @@
 ###################################
 ###################################
 ###################################
+
+##TODO Add Variables to make replacing software easier.
 
 ERROR_HANDLER ()
 {
@@ -27,11 +29,22 @@ PAUSE ()
 	read -p "$*"
 }
 
+VARIABLES ()
+{
+	#OTHER CARRIERS
+	image_link="https://dl.google.com/dl/android/aosp/shamu-lmy47i-factory-c8afc588.tgz"
+	tar_file="shamu-lmy47i-factory-c8afc588.tgz"
+	zip_file="shamu-lmy47i/image-shamu-lmy47i.zip"
+	bootloader="shamu-lmy47i/bootloader-shamu-moto-apq8084-71.08.img"
+	radio="shamu-lmy47i/radio-shamu-d4.0-9625-02.95.img"
+}
+
 PREP ()
 {
 	CURRENT_STEP="Prep"
 	echo
 	echo "Starting Prep."
+	VARIABLES
 	if ! [ -d /tmp/nexus6/shamu-lmy47i/ ];
 		then
 		echo
@@ -42,9 +55,9 @@ PREP ()
 		cd /tmp
 		mktemp -d "nexus6" || ERROR_HANDLER
 		cd /tmp/nexus6
-		curl -O  https://dl.google.com/dl/android/aosp/shamu-lmy47i-factory-c8afc588.tgz || ERROR_HANDLER
-		tar -zxvf shamu-lmy47i-factory-c8afc588.tgz || ERROR_HANDLER
-		unzip shamu-lmy47i/image-shamu-lmy47i.zip || ERROR_HANDLER
+		curl -O  $image_link || ERROR_HANDLER
+		tar -zxvf $tar_file || ERROR_HANDLER
+		unzip $zip_file || ERROR_HANDLER
 	fi
 }
 
@@ -86,8 +99,8 @@ ENTER_BOOTLOADER ()
 BOOTLOADER_RADIO ()
 {
 	CURRENT_STEP="Flashing Bootloader & Radio img."
-	fastboot flash bootloader /tmp/nexus6/shamu-lmy47i/bootloader-shamu-moto-apq8084-71.08.img || ERROR_HANDLER # Flash Bootloader.img
-	fastboot flash radio /tmp/nexus6/shamu-lmy47i/radio-shamu-d4.0-9625-02.95.img || ERROR_HANDLER # Flash Radio.img
+	fastboot flash bootloader /tmp/nexus6/$bootloader || ERROR_HANDLER # Flash Bootloader.img
+	fastboot flash radio /tmp/nexus6/$radio || ERROR_HANDLER # Flash Radio.img
 }
 
 BOOTLOADER_REBOOT ()
