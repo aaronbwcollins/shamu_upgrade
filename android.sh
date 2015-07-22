@@ -15,7 +15,7 @@
 ###################################
 ###################################
 
-##TODO Add Variables to make replacing software easier.
+##TODO add readme disclamer about multipe devicesv
 
 ERROR_HANDLER ()
 {
@@ -29,48 +29,13 @@ PAUSE ()
 	read -p "$*"
 }
 
-VARIABLES ()
-{
-#!/bin/bash
-# Bash Menu Script Example
-
-PS3='Please enter your choice: '
-options=("T-Mobile" "Project Fi" "Other Carriers" "Quit")
-select opt in "${options[@]}"
-do
-    case $opt in
-        "1")
-            echo "you chose choice 1"
-            ;;
-        "2")
-            echo "you chose choice 2"
-            ;;
-        "Other Carriers")
-            echo "you choose Other Carriers"
-            #OTHER CARRIERS
-			image_link="https://dl.google.com/dl/android/aosp/shamu-lmy47i-factory-c8afc588.tgz"
-			tar_file="shamu-lmy47i-factory-c8afc588.tgz"
-			zip_file="shamu-lmy47i/image-shamu-lmy47i.zip"
-			bootloader="shamu-lmy47i/bootloader-shamu-moto-apq8084-71.08.img"
-			radio="shamu-lmy47i/radio-shamu-d4.0-9625-02.95.img"
-            break
-            ;;
-        "Quit")
-            exit 1
-            ;;
-        *) echo invalid option;;
-    esac
-done
-
-}
-
 PREP ()
 {
 	CURRENT_STEP="Prep"
 	echo
 	echo "Starting Prep."
 	VARIABLES
-	if ! [ -d /tmp/nexus6/shamu-lmy47i/ ];
+	if ! [ -d /tmp/nexus6/ ];
 		then
 		echo
 		echo "Getting Base Image."
@@ -86,6 +51,57 @@ PREP ()
 	fi
 }
 
+VARIABLES ()
+{
+#!/bin/bash
+# Bash Menu Script Example
+
+gitdir=$PWD
+
+PS3='Please enter your choice: '
+options=("T-Mobile" "Project Fi" "Other Carriers" "Quit")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "T-Mobile")
+            echo "you chose T-Mobile"
+            #T-Mobile
+			image_link="https://dl.google.com/dl/android/aosp/shamu-lyz28e-factory-b542b88a.tgz"
+			tar_file="shamu-lyz28e-factory-b542b88a.tgz"
+			zip_file="shamu-lyz28e/image-shamu-lyz28e.zip"
+			bootloader="shamu-lyz28e/bootloader-shamu-moto-apq8084-71.10.img"
+			radio="shamu-lyz28e/radio-shamu-d4.0-9625-02.101.img"
+			break
+            ;;
+        "Project Fi")
+            echo "you chose Project Fi"
+            #Project Fi
+			image_link="https://dl.google.com/dl/android/aosp/shamu-lvy48c-factory-4b92ce24.tgz"
+			tar_file="shamu-lvy48c-factory-4b92ce24.tgz"
+			zip_file="shamu-lvy48c/image-shamu-lvy48c.zip"
+			bootloader="shamu-lvy48c/bootloader-shamu-moto-apq8084-71.10.img"
+			radio="shamu-lvy48c/radio-shamu-d4.0-9625-02.101.img"
+			break
+            ;;
+        "Other Carriers")
+            echo "you chose Other Carriers"
+            #OTHER CARRIERS
+			image_link="https://dl.google.com/dl/android/aosp/shamu-lmy47z-factory-33951732.tgz"
+			tar_file="shamu-lmy47z-factory-33951732.tgz"
+			zip_file="shamu-lmy47z/image-shamu-lmy47z.zip"
+			bootloader="shamu-lmy47z/bootloader-shamu-moto-apq8084-71.10.img"
+			radio="shamu-lmy47z/radio-shamu-d4.0-9625-02.101.img"
+			break
+            ;;
+        "Quit")
+            exit 1
+            ;;
+        *) echo invalid option;;
+    esac
+done
+
+}
+
 SDK_CHECK ()
 {
 	CURENT_STEP="SDK CHECK"
@@ -93,16 +109,27 @@ SDK_CHECK ()
 		then
 		if ! [ -e /usr/bin/adb ]
 			then
-			unzip ~/Downloads/tools.zip -d /tmp/nexus6 || ERROR_HANDLER
-			sudo cp /tmp/nexus6/tools/adb /usr/local/bin/ || ERROR_HANDLER
-			sudo cp /tmp/nexus6/tools/fastboot /usr/local/bin/ || ERROR_HANDLER
+			unzip /$gitdir/tools.zip -d /tmp/nexus6 || ERROR_HANDLER
+			sudo cp /$gitdir/tools/tools/adb /usr/local/bin/ || ERROR_HANDLER
+			sudo cp /$gitdir/tools/tools/fastboot /usr/local/bin/ || ERROR_HANDLER
 		else
 			echo "ADB and Fastboot look good."
 		fi		
 	else
-		cp ~/Library/Android/sdk/platform-tools/adb /usr/local/bin || ERROR_HANDLER
-		cp ~/Library/Android/sdk/platform-tools/fastboot /usr/local/bin || ERROR_HANDLER
+		ln -s ~/Library/Android/sdk/platform-tools/adb /usr/local/bin/adb || ERROR_HANDLER
+		ln -s ~/Library/Android/sdk/platform-tools/fastboot /usr/local/bin/fastboot || ERROR_HANDLER
 	fi
+}
+
+BOOT_VERIFY ()
+{
+	serial=$(adb devices | cut -c1-10 | sed '1d')
+	echo "Waiting for Phone"
+	while [ -z $serial ]
+	do
+	sleep 1 > /dev/null
+	serial=$(adb devices | cut -c1-10 | sed '1d')
+	done
 }
 
 ENTER_BOOTLOADER ()
@@ -110,15 +137,14 @@ ENTER_BOOTLOADER ()
 ## See about creating check for whether the device is attached
 	CURRENT_STEP="Entering Bootloader"
 	echo
-	echo "Make sure phone is plugged in"
 	echo "MAKE SURE OEM UNLOCKING is ON!"
 	PAUSE "Press any key to continue..."
-	#if [ adb devices | grep 
+	echo "Make sure phone is plugged in"
+	BOOT_VERIFY
 	adb reboot-bootloader || ERROR_HANDLER # Enter Bootloader 
-	#echo "Please" ## Enter instructions for entering adb
 	echo
 	echo "Entering Bootloader"
-	PAUSE "Press any key to continue..."
+	sleep 15
 }
 
 BOOTLOADER_RADIO ()
@@ -152,14 +178,11 @@ REBOOT ()
 BOOTLOADER_ROOT ()
 {
 	CURRENT_STEP="Rooting Device"
-	echo
-	echo "Please wait till update is finished before proceeding."
-	echo
-	echo
-	PAUSE "Please press any key to proceed with rooting."	
+	BOOT_VERIFY	
 	adb reboot-bootloader || ERROR_HANDLER
 	sleep 5
-	fastboot boot /tmp/nexus6/tools/CF-Auto-Root-shamu-shamu-nexus6.img || ERROR_HANDLER
+	fastboot boot $gitdir/tools/CF-Auto-Root-shamu-shamu-nexus6.img || ERROR_HANDLER
+	BOOT_VERIFY
 }
 
 CLEANUP ()
@@ -206,7 +229,12 @@ RUN ()
 	sleep 5
 	BOOTLOADER_RECOVERY_BOOT_SYSTEM
 	REBOOT
-	read -p "Reboot Now?" yn
+	echo "Phone Now Rebooting"
+	echo
+	echo "This May Take Awhile"
+	echo
+	PAUSE "Press any key once phone is FULLY rebooted"
+	read -p "Root Device?" yn
 		case $yn in
 			[Yy]* ) BOOTLOADER_ROOT
 				sleep 5
