@@ -48,6 +48,7 @@ PREP ()
 		curl -O  $image_link || ERROR_HANDLER
 		tar -zxvf $tar_file || ERROR_HANDLER
 		unzip $zip_file || ERROR_HANDLER
+		unzip /$gitdir/tools.zip -d /tmp/nexus6 || ERROR_HANDLER
 	fi
 }
 
@@ -64,7 +65,7 @@ select opt in "${options[@]}"
 do
     case $opt in
         "T-Mobile")
-            echo "you chose T-Mobile"
+            echo "You've selected T-Mobile"
             #T-Mobile
 			image_link="https://dl.google.com/dl/android/aosp/shamu-lyz28e-factory-b542b88a.tgz"
 			tar_file="shamu-lyz28e-factory-b542b88a.tgz"
@@ -74,7 +75,7 @@ do
 			break
             ;;
         "Project Fi")
-            echo "you chose Project Fi"
+            echo "You've selected Project Fi"
             #Project Fi
 			image_link="https://dl.google.com/dl/android/aosp/shamu-lvy48c-factory-4b92ce24.tgz"
 			tar_file="shamu-lvy48c-factory-4b92ce24.tgz"
@@ -84,7 +85,7 @@ do
 			break
             ;;
         "Other Carriers")
-            echo "you chose Other Carriers"
+            echo "You've selected Other Carriers"
             #OTHER CARRIERS
 			image_link="https://dl.google.com/dl/android/aosp/shamu-lmy47z-factory-33951732.tgz"
 			tar_file="shamu-lmy47z-factory-33951732.tgz"
@@ -107,11 +108,9 @@ SDK_CHECK ()
 	CURENT_STEP="SDK CHECK"
 	if ! [ -f ~/Library/Android/sdk/platform-tools/ ]
 		then
-		if ! [ -e /usr/bin/adb ]
-			then
-			unzip /$gitdir/tools.zip -d /tmp/nexus6 || ERROR_HANDLER
-			sudo cp /$gitdir/tools/tools/adb /usr/local/bin/ || ERROR_HANDLER
-			sudo cp /$gitdir/tools/tools/fastboot /usr/local/bin/ || ERROR_HANDLER
+		if ! [ -e /usr/local/bin/adb ]; then
+			sudo cp /tmp/nexus6/tools/adb /usr/local/bin/ || ERROR_HANDLER
+			sudo cp /tmp/nexus6/tools/fastboot /usr/local/bin/ || ERROR_HANDLER
 		else
 			echo "ADB and Fastboot look good."
 		fi		
@@ -144,7 +143,7 @@ ENTER_BOOTLOADER ()
 	adb reboot-bootloader || ERROR_HANDLER # Enter Bootloader 
 	echo
 	echo "Entering Bootloader"
-	sleep 15
+	sleep 7
 }
 
 BOOTLOADER_RADIO ()
@@ -181,7 +180,7 @@ BOOTLOADER_ROOT ()
 	BOOT_VERIFY	
 	adb reboot-bootloader || ERROR_HANDLER
 	sleep 5
-	fastboot boot $gitdir/tools/CF-Auto-Root-shamu-shamu-nexus6.img || ERROR_HANDLER
+	fastboot boot tmp/nexus6/tools/CF-Auto-Root-shamu-shamu-nexus6.img || ERROR_HANDLER
 	BOOT_VERIFY
 }
 
