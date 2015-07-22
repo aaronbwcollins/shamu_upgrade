@@ -94,7 +94,7 @@ do
 			radio="shamu-lmy47z/radio-shamu-d4.0-9625-02.101.img"
 			break
             ;;
-        "Quit")
+        "Quit")	
             exit 1
             ;;
         *) echo invalid option;;
