@@ -81,7 +81,7 @@ do
 			tar_file="shamu-lvy48c-factory-4b92ce24.tgz"
 			zip_file="shamu-lvy48c/image-shamu-lvy48c.zip"
 			bootloader="shamu-lvy48c/bootloader-shamu-moto-apq8084-71.10.img"
-			radio="radio-shamu-d4.0-9625-02.102+fsg-9625-02.78.05.img"
+			radio="shamu-lvy48c/radio-shamu-d4.0-9625-02.102+fsg-9625-02.78.05.img"
 			break
             ;;
         "Other Carriers")
