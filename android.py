@@ -9,9 +9,9 @@ import commands
 
 #### UNCOMMENT THESE LINES TODO ####
 
-# os.system("open https://developers.google.com/android/nexus/images?hl=en#shamu")
-# build_number = raw_input("Enter your build number: ")
-# build_number = 'LVY48E'
+#os.system("open https://developers.google.com/android/nexus/images?hl=en#shamu")
+#build_number = raw_input("Enter your build number: ")
+build_number = 'LVY48E'
 
 # base_url = "https://dl.google.com/dl/android/aosp/shamu-{}".format(build_number.lower())
 
@@ -22,32 +22,36 @@ response = commands.getoutput('curl https://developers.google.com/android/nexus/
 # 5.1.1 (For Project Fi ONLY) (LVY48C)
 
 # want all build numbers
-results = re.findall(r'shamu[a-z0-9]{6}">\n\s{0,10}<td>(\d\.\d\.\d) \(([^)]+)\) \(([^)]+)\)\n\s{0,10}<td><a href="([^"]*)"', response)
-results += re.findall(r'shamu[a-z0-9]{6}">\n\s{0,10}<td>(\d\.\d\.\d) \((L[^)]+)\)\n\s{0,10}<td><a href="([^"]*)"', response)
+results = re.findall(r'shamu[a-z0-9]{6}">\n\s{0,10}<td>(\d\.\d\.\d) \(([^)]+)\) \(([^)]+)\)\n\s{0,10}<td><a href="([^"]*)">Link</a>\n\s{0,10}<td>([a-z0-9]{32})', response)
+results += re.findall(r'shamu[a-z0-9]{6}">\n\s{0,10}<td>(\d\.\d\.\d) \((L[^)]+)\)\n\s{0,10}<td><a href="([^"]*)">Link</a>\n\s{0,10}<td>([a-z0-9]{32})', response)
 
-builds = list(reversed(sorted(set(results))))
+print (results)
+#TODO
+#Add md5 sum to results and run against downloaded file
+
+
+builds = list(reversed(sorted(set(results))))	
 max_build_number = builds[0][0]
 # builds = [('a', 'b', 'c'), ('a', 'b', 'c')]
 builds = [i for i in builds if i[0] == max_build_number]
 # builds = filter(lambda x: x[0] == max_build_number, builds)
 # pprint.pprint(builds)
 
-## Pick build
-# chosen_build = raw_input("Pick your build (ex: LVY48E):")
-chosen_build = 'LVY48E' ## HARDCODED FOR TESTING TODO
+#build_number = 'LVY48E' ## HARDCODED FOR TESTING TODO
 chosen_set = None
 print(builds)
 for build in builds:
-    print(build[-2], chosen_build, build[-2] == chosen_build)
-    if build[-2] == chosen_build:
+    print(build[-3], build_number, build[-3] == build_number)
+    if build[-3] == build_number:
         chosen_set = build
         break
 print(chosen_set)
 assert chosen_set
 
-build_number = chosen_set[-2]
-build_link = chosen_set[-1]
-
+build_number = chosen_set[-3]
+build_link = chosen_set[-2]
+# Getting Traceback errors
+build_md5 = choose_set[-1]
 # link is at -1, version is at -2
 
 tmpdir_path = tempfile.mkdtemp()
@@ -62,7 +66,7 @@ with zipfile.ZipFile('tools.zip', 'r') as tools:
     
 os.system("open {}".format(tmpdir_path))
 # print("curl -o {filename} {link}".format(filename="{}/{}.tgz".format(image_dir, build_number), link=build_link))
-os.system("curl -O {filename} {link}".format(filename="{}/{}.tgz".format(image_dir, build_number), link=build_link))
+os.system("curl -o {filename} {link}".format(filename="{}/{}.tgz".format(image_dir, build_number), link=build_link))
 
 # shutil.rmtree(tmpdir_path)
 
