@@ -69,16 +69,26 @@ os.system("open {}".format(tmpdir_path))
 # print("curl -o {filename} {link}".format(filename="{}/{}.tgz".format(image_dir, build_number), link=build_link))
 os.system("curl -o {filename} {link}".format(filename="{}/{}.tgz".format(image_dir, build_number), link=build_link))
 
+generate_file_md5("/Userers/sdfds/fsdf")
+generate_file_md5("/Userers/sdfds/fsdf", "dfsd4.txt")
+
 # check file was downloaded properly
-def generate_file_md5(rootdir, filename, blocksize=2**20):
-	m = hashlib.md5()
-	with open(os.path.join(image_dir, filename) , 'rb') as file_to_check:
-		while True:
-			data = file_to_check.read(blocksize)
-			if not data:
-				break
-			m.update(data)
-	md5_returned = m.hexdigest()
+# def generate_file_md5(rootdir, filename, blocksize=2**20):
+# 	m = hashlib.md5()
+# 	with open(os.path.join(image_dir, filename) , 'rb') as file_to_check:
+# 		while True:
+# 			data = file_to_check.read(blocksize)
+# 			if not data:
+# 				break
+# 			m.update(data)
+# 	md5_returned = m.hexdigest()
+
+def generate_file_md5(rootdir, filename="file.txt"):
+    hash = hashlib.md5()
+    with open(os.path.join(rootdir, filename)) as f:
+        for chunk in iter(lambda: f.read(10240), ""):
+            hash.update(chunk)
+    return hash.hexdigest()
 
 if build_md5 == md5_returned:
 	print "md5 verifed"
