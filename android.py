@@ -77,7 +77,7 @@ def generate_file_md5(rootdir, filename, blocksize=2**20):
 			data = file_to_check.read(blocksize)
 			if not data:
 				break
-			m.update(dat)
+			m.update(data)
 	md5_returned = m.hexdigest()
 
 if build_md5 == md5_returned:
