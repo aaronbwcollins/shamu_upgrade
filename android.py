@@ -6,6 +6,7 @@ import shutil
 import tempfile
 import zipfile
 import commands
+import hashlib
 
 #### UNCOMMENT THESE LINES TODO ####
 
@@ -67,6 +68,20 @@ with zipfile.ZipFile('tools.zip', 'r') as tools:
 os.system("open {}".format(tmpdir_path))
 # print("curl -o {filename} {link}".format(filename="{}/{}.tgz".format(image_dir, build_number), link=build_link))
 os.system("curl -o {filename} {link}".format(filename="{}/{}.tgz".format(image_dir, build_number), link=build_link))
+
+# check file was downloaded properly
+md5_check = '{filename}'
+with open({filename}, 'rb') as file_to_check:
+	data = file_to_check.read()
+	md5_returned = hashlib.md5(data).hexdigest()
+
+if build_md5 == md5_returned:
+	print "md5 verifed"
+else:
+	print "md5 verification failed"
+	exit
+
+
 
 # shutil.rmtree(tmpdir_path)
 
