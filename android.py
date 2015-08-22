@@ -70,17 +70,21 @@ os.system("open {}".format(tmpdir_path))
 os.system("curl -o {filename} {link}".format(filename="{}/{}.tgz".format(image_dir, build_number), link=build_link))
 
 # check file was downloaded properly
-md5_check = '{filename}'
-with open({filename}, 'rb') as file_to_check:
-	data = file_to_check.read()
-	md5_returned = hashlib.md5(data).hexdigest()
+def generate_file_md5(rootdir, filename, blocksize=2**20):
+	m = hashlib.md5()
+	with open(os.path.join(image_dir, filename) , 'rb') as file_to_check:
+		while True:
+			data = file_to_check.read(blocksize)
+			if not data:
+				break
+			m.update(dat)
+	md5_returned = m.hexdigest()
 
 if build_md5 == md5_returned:
 	print "md5 verifed"
 else:
 	print "md5 verification failed"
 	exit
-
 
 
 # shutil.rmtree(tmpdir_path)
