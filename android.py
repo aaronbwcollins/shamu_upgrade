@@ -69,8 +69,7 @@ os.system("open {}".format(tmpdir_path))
 # print("curl -o {filename} {link}".format(filename="{}/{}.tgz".format(image_dir, build_number), link=build_link))
 os.system("curl -o {filename} {link}".format(filename="{}/{}.tgz".format(image_dir, build_number), link=build_link))
 
-generate_file_md5("/Userers/sdfds/fsdf")
-generate_file_md5("/Userers/sdfds/fsdf", "dfsd4.txt")
+generate_file_md5(image_dir, build_number)
 
 # check file was downloaded properly
 # def generate_file_md5(rootdir, filename, blocksize=2**20):
@@ -88,7 +87,7 @@ def generate_file_md5(rootdir, filename="file.txt"):
     with open(os.path.join(rootdir, filename)) as f:
         for chunk in iter(lambda: f.read(10240), ""):
             hash.update(chunk)
-    return hash.hexdigest()
+    md5_returned = hash.hexdigest()
 
 if build_md5 == md5_returned:
 	print "md5 verifed"
