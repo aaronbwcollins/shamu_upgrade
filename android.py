@@ -33,6 +33,7 @@ print (results)
 
 builds = list(reversed(sorted(set(results))))	
 max_build_number = builds[0][0]
+print (builds)
 # builds = [('a', 'b', 'c'), ('a', 'b', 'c')]
 builds = [i for i in builds if i[0] == max_build_number]
 # builds = filter(lambda x: x[0] == max_build_number, builds)
@@ -52,8 +53,12 @@ assert chosen_set
 build_number = chosen_set[-3]
 build_link = chosen_set[-2]
 # Getting Traceback errors
-build_md5 = choose_set[-1]
+build_md5 = chosen_set[-1]
 # link is at -1, version is at -2
+print (build_number)
+print (build_link)
+print (build_md5)
+
 
 tmpdir_path = tempfile.mkdtemp()
 tools_dir = os.path.join(tmpdir_path, 'nexus6')
