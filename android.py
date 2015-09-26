@@ -102,6 +102,50 @@ else:
     print("md5 verification failed")
     exit()
 
+tool_path = '~/Library/Android/sdk/platform-tools/'
+
+def tool_check(tool_path):
+    if os.path.exists(tool_path) == "False":
+    ## copy adb and fastboot tools to /usr/local/bin
+    else:
+        ## Symlink adb and fastboot to /usr/local/bin
+        subprocess.call('ln', '-s', '~/Library/Android/sdk/platform-tools/adb', '/usr/local/bin/adb')
+        subprocess.call('ln', '-s', '~/Library/Android/sdk/platform-tools/fastboot', '/usr/local/bin/adb')
+    ## test that adb and fastboot are functioning properly
+    try:
+       devnull = open(os.devnull)
+       subprocess.Popen(adb, stdout=devnull, stderr=devnull).communicate()
+    except OSError as e:
+        if e.errno == os.errno.ENOENT:
+            return OSError
+    try:
+        subprocess.Popen(fastboot, stdout=devnull, stderr=devnull).communicate()
+    except OSError as e:
+        if e.errno == os.errno.ENOENT:
+            return OSError
+
+## Check to see if phone is connected
+def connect_check():
+    serial = subprocess.Popen(('adb', 'devices'), stdout=subprocess.PIPE)
+    serial_output1 = subprocess.check_serial_ouput1(('cut', '-c1-10'), stdin=serial.stdout, stdout=subprocess.PIPE)
+    serial_output2 = subprocess.check_serial_ouput2(('sed', '1d'), stdin=serial_output1)
+    serial.wait()
+
+def boot_verify():
+    connect_check
+    while serial == '':
+        os.system("sleep 1")
+        connect_check
+
+## TODO Enter Bootloader
+## Flash Radio
+## Reboot Phone
+## boot_verify
+os.system("sleep 5")
+## BOOTLOADER_RECOVERY_BOOT_SYSTEM
+## Reboot Phone
+## Root Device
+
 # shutil.rmtree(tmpdir_path)
 
 # choose your version number
