@@ -105,7 +105,7 @@ else:
 tool_path = '~/Library/Android/sdk/platform-tools/'
 
 def tool_check(tool_path):
-    if os.path.exists(tool_path) == "False":
+    if os.path.exists(tool_path) == False:
     ## copy adb and fastboot tools to /usr/local/bin
     else:
         ## Symlink adb and fastboot to /usr/local/bin
